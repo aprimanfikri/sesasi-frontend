@@ -8,12 +8,7 @@ import {
   loginRequest,
   registerRequest,
 } from '@/lib/api/auth';
-import {
-  loginFormSchema,
-  LoginFormValues,
-  registerFormSchema,
-  RegisterFormValues,
-} from '@/lib/validation/auth';
+import { LoginFormValues, RegisterFormValues } from '@/lib/validation/auth';
 import { errorHandler } from '@/lib/error-handler';
 import { sanitizeSession } from '@/lib/utils';
 import { UserRole } from '@/types';
@@ -24,12 +19,7 @@ export const getSession = async () => {
   const session = await getIronSession<Session>(cookieStore, sessionOptions);
 
   if (!session.isLoggedIn) {
-    session.isLoggedIn = defaultSession.isLoggedIn;
-    session.id = defaultSession.id;
-    session.name = defaultSession.name;
-    session.email = defaultSession.email;
-    session.role = defaultSession.role;
-    session.token = defaultSession.token;
+    Object.assign(session, defaultSession);
   }
 
   if (!session.token) {
@@ -37,7 +27,19 @@ export const getSession = async () => {
     return session;
   }
 
-  const profile = await getProfileRequest(session.token);
+  let profile;
+
+  try {
+    profile = await getProfileRequest(session.token);
+  } catch {
+    Object.assign(session, defaultSession);
+    return session;
+  }
+
+  if (!profile.success) {
+    Object.assign(session, defaultSession);
+    return session;
+  }
 
   session.id = profile.data.user.id;
   session.name = profile.data.user.name;
@@ -49,22 +51,10 @@ export const getSession = async () => {
 };
 
 export const registerAction = async (values: RegisterFormValues) => {
-  const result = registerFormSchema.safeParse(values);
-
-  if (!result.success) {
-    return {
-      success: false,
-      message: 'Invalid input',
-    };
-  }
-
   try {
-    await registerRequest(result.data);
+    const response = await registerRequest(values);
 
-    return {
-      success: true,
-      message: 'Registration successful',
-    };
+    return response;
   } catch (error) {
     return errorHandler(error);
   }
@@ -88,18 +78,11 @@ type LoginActionResponse =
 export const loginAction = async (
   values: LoginFormValues
 ): Promise<LoginActionResponse> => {
-  const session = await getSession();
-  const result = loginFormSchema.safeParse(values);
-
-  if (!result.success) {
-    return {
-      success: false,
-      message: 'Invalid input',
-    };
-  }
-
   try {
-    const response = await loginRequest(result.data);
+    const session = await getSession();
+
+    const response = await loginRequest(values);
+
     const profile = await getProfileRequest(response.data.token);
 
     session.id = profile.data.user.id;

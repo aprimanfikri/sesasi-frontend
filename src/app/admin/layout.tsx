@@ -4,6 +4,11 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { getSession } from '@/lib/action/auth';
 import { sanitizeSession } from '@/lib/utils';
 import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Admin Dashboard',
+};
 
 const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getSession();

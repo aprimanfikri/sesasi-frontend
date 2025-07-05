@@ -25,7 +25,7 @@ interface NavUserProps {
   session: Session;
 }
 
-export function NavUser({ session }: NavUserProps) {
+const NavUser = ({ session }: NavUserProps) => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const { isMobile } = useSidebar();
@@ -94,10 +94,12 @@ export function NavUser({ session }: NavUserProps) {
         open={showLogoutDialog}
         onOpenChange={setShowLogoutDialog}
         title="Are you sure?"
-        description="You will be logged out of your account."
+        description="You will be logged out of your account"
       >
         <LogOutButton setShowLogoutDialog={setShowLogoutDialog} />
       </CustomDialog>
     </SidebarMenu>
   );
-}
+};
+
+export default NavUser;

@@ -1,25 +1,30 @@
-import { Layout } from 'lucide-react';
+import { File as FileIcon, Users as UsersIcon } from 'lucide-react';
 
 export const adminSidebarItems = [
   {
-    title: 'Dashboard',
+    title: 'Permission',
     url: '/admin',
-    icon: Layout,
+    icon: FileIcon,
+  },
+  {
+    title: 'User',
+    url: '/admin/user',
+    icon: UsersIcon,
   },
 ];
 
 export const verificatorSidebarItems = [
   {
-    title: 'Dashboard',
+    title: 'Permission',
     url: '/verificator',
-    icon: Layout,
+    icon: FileIcon,
   },
 ];
 
 export const userSidebarItems = [
   {
-    title: 'Dashboard',
+    title: 'Permission',
     url: '/user',
-    icon: Layout,
+    icon: FileIcon,
   },
 ];
