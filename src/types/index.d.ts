@@ -5,6 +5,7 @@ export type PermissionStatus =
   | 'REJECTED'
   | 'REVISED'
   | 'CANCELLED';
+export type UserStatus = 'ACTIVE' | 'INACTIVE';
 
 declare global {
   interface Session {
@@ -22,7 +23,7 @@ declare global {
     email: string;
     password: string;
     role: UserRole;
-    isVerified: boolean;
+    status: UserStatus;
     createdAt: Date;
     updatedAt: Date;
     createdPermissions?: Permission[];

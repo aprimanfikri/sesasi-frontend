@@ -3,6 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '../ui/badge';
 import { format } from 'date-fns';
+import { UserCell } from './cells';
 
 export const userColumns: ColumnDef<User>[] = [
   {
@@ -18,7 +19,7 @@ export const userColumns: ColumnDef<User>[] = [
     header: 'Role',
   },
   {
-    accessorKey: 'isVerified',
+    accessorKey: 'status',
     header: 'Status',
     filterFn: (row, columnId, filterValue) => {
       if (filterValue === undefined) return true;
@@ -26,15 +27,13 @@ export const userColumns: ColumnDef<User>[] = [
       return String(value) === filterValue;
     },
     cell: ({ row }) => {
-      const { isVerified } = row.original;
+      const { status } = row.original;
 
-      if (isVerified) {
-        return <Badge className="bg-green-500 text-green-50">Verified</Badge>;
+      if (status === 'ACTIVE') {
+        return <Badge className="bg-green-500 text-green-50">Active</Badge>;
       }
 
-      return (
-        <Badge className="bg-yellow-500 text-yellow-50">Not Verified</Badge>
-      );
+      return <Badge className="bg-yellow-500 text-yellow-50">Inactive</Badge>;
     },
   },
   {
@@ -45,6 +44,16 @@ export const userColumns: ColumnDef<User>[] = [
 
       return <div>{permissions.length}</div>;
     },
+  },
+  {
+    id: 'actions',
+    header: () => <div className="text-center">Actions</div>,
+    cell: ({ row, table }) => (
+      <UserCell
+        row={row}
+        session={(table.options.meta as { session: Session }).session}
+      />
+    ),
   },
 ];
 
@@ -62,7 +71,6 @@ export const permissionColumns: ColumnDef<Permission>[] = [
     header: 'User',
     cell: ({ row }) => {
       const user = row.original.user;
-      console.log(user);
       return <div>{user?.name || '-'}</div>;
     },
   },

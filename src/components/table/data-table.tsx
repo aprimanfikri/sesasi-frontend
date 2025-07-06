@@ -30,6 +30,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { UserStatus } from '@/types';
+import { Plus } from 'lucide-react';
+import CustomDialog from '../custom-dialog';
+import UserForm from '../form/user-form';
 
 interface DataTableMeta<TData extends object> {
   session: Session;
@@ -53,6 +57,7 @@ const DataTable = <TData extends object, TValue>({
 }: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const table = useReactTable({
     data,
@@ -83,54 +88,83 @@ const DataTable = <TData extends object, TValue>({
           }
           className="max-w-xs"
         />
-        {session.role !== 'USER' && type === 'permission' && (
-          <Select
-            value={
-              (table.getColumn('status')?.getFilterValue() as string) ?? ''
-            }
-            onValueChange={(value) =>
-              table
-                .getColumn('status')
-                ?.setFilterValue(value === 'ALL' ? undefined : value)
-            }
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All</SelectItem>
-              {['PENDING', 'APPROVED', 'REJECTED', 'REVISED', 'CANCELLED'].map(
-                (status) => (
+        <div className="flex items-center justify-center gap-4">
+          {session.role !== 'USER' && type === 'permission' && (
+            <Select
+              value={
+                (table.getColumn('status')?.getFilterValue() as string) ?? ''
+              }
+              onValueChange={(value) =>
+                table
+                  .getColumn('status')
+                  ?.setFilterValue(value === 'ALL' ? undefined : value)
+              }
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All</SelectItem>
+                {[
+                  'PENDING',
+                  'APPROVED',
+                  'REJECTED',
+                  'REVISED',
+                  'CANCELLED',
+                ].map((status) => (
                   <SelectItem key={status} value={status}>
                     {status.charAt(0) + status.slice(1).toLowerCase()}
                   </SelectItem>
-                )
-              )}
-            </SelectContent>
-          </Select>
-        )}
-        {session.role !== 'USER' && type === 'user' && (
-          <Select
-            value={
-              (table.getColumn('isVerified')?.getFilterValue() as string) ??
-              'ALL'
-            }
-            onValueChange={(value) =>
-              table
-                .getColumn('isVerified')
-                ?.setFilterValue(value === 'ALL' ? undefined : value)
-            }
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter Verified" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All</SelectItem>
-              <SelectItem value="true">Verified</SelectItem>
-              <SelectItem value="false">Not Verified</SelectItem>
-            </SelectContent>
-          </Select>
-        )}
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          {session.role !== 'USER' && type === 'user' && (
+            <Select
+              value={
+                (table.getColumn('status')?.getFilterValue() as UserStatus) ??
+                'ALL'
+              }
+              onValueChange={(value) =>
+                table
+                  .getColumn('status')
+                  ?.setFilterValue(value === 'ALL' ? undefined : value)
+              }
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter Verified" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All</SelectItem>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+                <SelectItem value="INACTIVE">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          {type === 'user' && session.role === 'ADMIN' && (
+            <>
+              <Button
+                variant="ghost"
+                onClick={() => setOpenDialog(true)}
+                className="cursor-pointer"
+              >
+                <Plus /> Create User
+              </Button>
+              <CustomDialog
+                open={openDialog}
+                onOpenChange={setOpenDialog}
+                title="Create User"
+                description="Fill in the form to create a new user"
+                showCloseButton={true}
+              >
+                <UserForm
+                  session={session}
+                  onSave={() => setOpenDialog(false)}
+                />
+              </CustomDialog>
+            </>
+          )}
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>

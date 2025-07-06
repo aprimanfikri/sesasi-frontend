@@ -19,6 +19,11 @@ export const verificatorSidebarItems = [
     url: '/verificator',
     icon: FileIcon,
   },
+  {
+    title: 'User',
+    url: '/verificator/user',
+    icon: UsersIcon,
+  },
 ];
 
 export const userSidebarItems = [
