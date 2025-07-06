@@ -16,9 +16,11 @@ import { useFormContext } from 'react-hook-form';
 const PasswordInputField = ({
   disabled,
   placeholder,
+  name = 'password',
 }: {
   disabled: boolean;
   placeholder?: string;
+  name?: string;
 }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -42,7 +44,7 @@ const PasswordInputField = ({
   return (
     <FormField
       control={control}
-      name="password"
+      name={name}
       render={({ field }) => (
         <FormItem>
           <FormLabel>Password</FormLabel>

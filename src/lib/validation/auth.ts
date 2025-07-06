@@ -25,8 +25,6 @@ export const loginFormSchema = z.object({
     }),
 });
 
-export type LoginFormValues = z.infer<typeof loginFormSchema>;
-
 export const registerFormSchema = z.object({
   name: z
     .string({
@@ -62,4 +60,78 @@ export const registerFormSchema = z.object({
     }),
 });
 
+export const accountFormSchema = z.object({
+  name: z
+    .string({
+      required_error: 'Name is required',
+    })
+    .min(3, {
+      message: 'Name must be at least 3 characters',
+    })
+    .max(50, {
+      message: 'Name must not exceed 50 characters',
+    }),
+  email: z
+    .string({
+      required_error: 'Email is required',
+    })
+    .email({
+      message: 'Invalid email format',
+    }),
+});
+
+export const passwordFormSchema = z
+  .object({
+    password: z
+      .string({
+        required_error: 'Current password is required',
+      })
+      .min(8, {
+        message: 'Current password must be at least 8 characters',
+      }),
+    newPassword: z
+      .string({
+        required_error: 'New password is required',
+      })
+      .min(8, {
+        message: 'New password must be at least 8 characters',
+      }),
+    newConfirmPassword: z
+      .string({
+        required_error: 'Confirm password is required',
+      })
+      .min(8, {
+        message: 'Confirm password must be at least 8 characters',
+      }),
+  })
+  .refine(
+    (data) => {
+      if (data.newPassword || data.newConfirmPassword || data.password) {
+        return data.newPassword === data.newConfirmPassword;
+      }
+      return true;
+    },
+    {
+      message: 'New password does not match',
+      path: ['newConfirmPassword'],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.password || data.newPassword || data.newConfirmPassword) {
+        return (
+          !!data.password && !!data.newPassword && !!data.newConfirmPassword
+        );
+      }
+      return true;
+    },
+    {
+      message: 'All password fields are required to change password',
+      path: ['password'],
+    }
+  );
+
+export type LoginFormValues = z.infer<typeof loginFormSchema>;
 export type RegisterFormValues = z.infer<typeof registerFormSchema>;
+export type AccountFormValues = z.infer<typeof accountFormSchema>;
+export type PasswordFormValues = z.infer<typeof passwordFormSchema>;

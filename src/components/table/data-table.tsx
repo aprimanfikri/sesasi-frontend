@@ -34,6 +34,7 @@ import { UserStatus } from '@/types';
 import { Plus } from 'lucide-react';
 import CustomDialog from '../custom-dialog';
 import UserForm from '../form/user-form';
+import PermissionForm from '../form/permission-form';
 
 interface DataTableMeta<TData extends object> {
   session: Session;
@@ -158,6 +159,29 @@ const DataTable = <TData extends object, TValue>({
                 showCloseButton={true}
               >
                 <UserForm
+                  session={session}
+                  onSave={() => setOpenDialog(false)}
+                />
+              </CustomDialog>
+            </>
+          )}
+          {type === 'permission' && session.role === 'USER' && (
+            <>
+              <Button
+                variant="ghost"
+                onClick={() => setOpenDialog(true)}
+                className="cursor-pointer"
+              >
+                <Plus /> Create Permission
+              </Button>
+              <CustomDialog
+                open={openDialog}
+                onOpenChange={setOpenDialog}
+                title="Create Permission"
+                description="Fill in the form to create a new permission"
+                showCloseButton={true}
+              >
+                <PermissionForm
                   session={session}
                   onSave={() => setOpenDialog(false)}
                 />

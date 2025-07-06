@@ -7,11 +7,19 @@ import {
   getProfileRequest,
   loginRequest,
   registerRequest,
+  updateAccountRequest,
+  updatePasswordRequest,
 } from '@/lib/api/auth';
-import { LoginFormValues, RegisterFormValues } from '@/lib/validation/auth';
+import {
+  AccountFormValues,
+  LoginFormValues,
+  PasswordFormValues,
+  RegisterFormValues,
+} from '@/lib/validation/auth';
 import { errorHandler } from '@/lib/error-handler';
 import { sanitizeSession } from '@/lib/utils';
 import { UserRole } from '@/types';
+import { revalidatePath } from 'next/cache';
 
 export const getSession = async () => {
   const cookieStore = await cookies();
@@ -123,6 +131,48 @@ export const logoutAction = async () => {
       success: true,
       message: 'Logout successful.',
     };
+  } catch (error) {
+    return errorHandler(error);
+  }
+};
+
+export const updateAccountAction = async (
+  session: Session,
+  values: AccountFormValues
+) => {
+  try {
+    const response = await updateAccountRequest(session, values);
+
+    switch (session.role) {
+      case 'ADMIN':
+        revalidatePath('/admin');
+        revalidatePath('/admin/user');
+        break;
+      case 'VERIFICATOR':
+        revalidatePath('/verificator');
+        revalidatePath('/verificator/user');
+        break;
+      case 'USER':
+        revalidatePath('/user');
+        break;
+      default:
+        revalidatePath('/');
+    }
+
+    return response;
+  } catch (error) {
+    return errorHandler(error);
+  }
+};
+
+export const updatePasswordAction = async (
+  session: Session,
+  values: PasswordFormValues
+) => {
+  try {
+    const response = await updatePasswordRequest(session, values);
+
+    return response;
   } catch (error) {
     return errorHandler(error);
   }

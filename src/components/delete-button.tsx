@@ -4,9 +4,12 @@ import { useTransition } from 'react';
 import { toast } from 'sonner';
 import SubmitButton from '@/components/submit-button';
 import { deleteUserAction } from '@/lib/action/user';
-import { deletePermissionAction } from '@/lib/action/permission';
+import {
+  cancelPermissionAction,
+  deletePermissionAction,
+} from '@/lib/action/permission';
 
-type Type = 'user' | 'permission';
+type Type = 'user' | 'permission' | 'cancel';
 
 interface DeleteButtonProps {
   id: string;
@@ -30,6 +33,7 @@ const DeleteButton = ({
       const actions = {
         user: deleteUserAction,
         permission: deletePermissionAction,
+        cancel: cancelPermissionAction,
       };
       const deleteAction = actions[type];
 
@@ -52,7 +56,7 @@ const DeleteButton = ({
       <SubmitButton
         onClick={() => setShowDeleteDialog(false)}
         isPending={isPending}
-        text="Cancel"
+        text="Close"
         type="button"
         className="w-[100px]"
         variant="outline"
@@ -60,9 +64,9 @@ const DeleteButton = ({
       <SubmitButton
         onClick={handleDelete}
         isPending={isPending}
-        text="Delete"
+        text={type === 'cancel' ? 'Confirm Cancel' : 'Delete'}
         type="button"
-        className="w-[100px]"
+        className="w-[130px]"
         variant="destructive"
       />
     </div>

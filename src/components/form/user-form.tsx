@@ -45,11 +45,7 @@ const UserForm = ({ session, onSave, user }: UserFormProps) => {
   const schema = user?.id
     ? isAdmin
       ? updateUserFormSchema
-      : z.object({
-          status: z.enum(['ACTIVE', 'INACTIVE'], {
-            required_error: 'Status must not be empty',
-          }),
-        })
+      : updateUserFormSchema.pick({ status: true })
     : createUserFormSchema;
 
   const defaultValues = user?.id

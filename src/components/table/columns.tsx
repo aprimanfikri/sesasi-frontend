@@ -3,7 +3,14 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '../ui/badge';
 import { format } from 'date-fns';
-import { UserCell } from './cells';
+import { PermissionCell, UserCell, UserPermissionCell } from './cells';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../ui/tooltip';
+import { Info } from 'lucide-react';
 
 export const userColumns: ColumnDef<User>[] = [
   {
@@ -115,5 +122,105 @@ export const permissionColumns: ColumnDef<Permission>[] = [
           );
       }
     },
+  },
+  {
+    id: 'actions',
+    header: () => <div className="text-center">Actions</div>,
+    cell: ({ row, table }) => (
+      <PermissionCell
+        row={row}
+        session={(table.options.meta as { session: Session }).session}
+      />
+    ),
+  },
+];
+
+export const userPermissionColumns: ColumnDef<Permission>[] = [
+  {
+    accessorKey: 'title',
+    header: 'Title',
+  },
+  {
+    accessorKey: 'description',
+    header: 'Description',
+  },
+  {
+    accessorKey: 'startDate',
+    header: 'Start Date',
+    cell: ({ row }) => {
+      const startDate = row.original.startDate;
+      return <div>{format(startDate, 'MMMM dd, yyyy')}</div>;
+    },
+  },
+  {
+    accessorKey: 'endDate',
+    header: 'End Date',
+    cell: ({ row }) => {
+      const endDate = row.original.endDate;
+      return <div>{format(endDate, 'MMMM dd, yyyy')}</div>;
+    },
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const { status, verificatorComment } = row.original;
+
+      const badge = (() => {
+        switch (status) {
+          case 'APPROVED':
+            return (
+              <Badge className="bg-green-500 text-green-50">Approved</Badge>
+            );
+          case 'REJECTED':
+            return <Badge className="bg-red-500 text-red-50">Rejected</Badge>;
+          case 'PENDING':
+            return (
+              <Badge className="bg-yellow-500 text-yellow-50">Pending</Badge>
+            );
+          case 'REVISED':
+            return <Badge className="bg-blue-500 text-blue-50">Revised</Badge>;
+          case 'CANCELLED':
+            return (
+              <Badge className="bg-gray-500 text-gray-50">Cancelled</Badge>
+            );
+          default:
+            return (
+              <Badge className="bg-neutral-500 text-neutral-50">Unknown</Badge>
+            );
+        }
+      })();
+
+      const showInfo =
+        (status === 'REVISED' || status === 'REJECTED') && verificatorComment;
+
+      return (
+        <div className="flex items-center gap-2">
+          {badge}
+          {showInfo && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="w-4 h-4 text-muted-foreground cursor-pointer" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{verificatorComment}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    id: 'actions',
+    header: () => <div className="text-center">Actions</div>,
+    cell: ({ row, table }) => (
+      <UserPermissionCell
+        row={row}
+        session={(table.options.meta as { session: Session }).session}
+      />
+    ),
   },
 ];

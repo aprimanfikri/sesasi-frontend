@@ -41,8 +41,6 @@ export const createUserFormSchema = z.object({
   }),
 });
 
-export type CreateUserFormValues = z.infer<typeof createUserFormSchema>;
-
 export const updateUserFormSchema = z.object({
   name: z
     .string({
@@ -91,4 +89,5 @@ export const updateUserFormSchema = z.object({
     .optional(),
 });
 
+export type CreateUserFormValues = z.infer<typeof createUserFormSchema>;
 export type UpdateUserFormValues = z.infer<typeof updateUserFormSchema>;
